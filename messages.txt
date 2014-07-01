@@ -1,0 +1,20 @@
+JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'primary' to 'secondary-hold' state due to Manual failover
+JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'primary' to 'secondary-hold' state due to Manual failoverJun 30 14:18:11 end dump
+JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expired
+JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expiredJun 30 14:23:12 end dump
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'hold' to 'secondary' state due to Hold timer expired
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'hold' to 'secondary' state due to Hold timer expiredJun 30 14:24:14 end dump
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary' to 'primary' state due to Better priority (254/1)
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary' to 'primary' state due to Better priority (254/1)Jun 30 14:24:15 end dump
+JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'secondary' to 'primary' state due to Remote node is in secondary hold
+JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'secondary' to 'primary' state due to Remote node is in secondary holdJun 30 14:26:54 end dump
+JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 1
+JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 1Jun 30 15:28:06 end dump
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expired
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expiredJun 30 15:47:24 end dump
+JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 1
+JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 1Jun 30 15:47:27 end dump
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'primary' to 'secondary-hold' state due to Manual failover
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'primary' to 'secondary-hold' state due to Manual failoverJun 30 15:47:48 end dump
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary' to 'primary' state due to Remote yield (255/0)
+JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary' to 'primary' state due to Remote yield (255/0)Jun 30 15:54:14 end dump
