@@ -69,12 +69,13 @@ template jdate-iso8601($date) {
 /* $date1 and $date2 must be in ISO8601 format */
 /* $diff is in seconds */
 template compare-date($date1,$date2,$diff){
-  $d1seconds = date:seconds($date1);
-  $d2seconds = date:seconds($date2);
-  if ($d1seconds - $d2seconds > $diff) {
+  var $d1seconds = date:seconds($date1);
+  var $d2seconds = date:seconds($date2);
+  var $calcdiff = $d2seconds - $d1seconds;
+  if ($calcdiff > $diff) {
     /* The two times are not within the diff */
     <result> false();
-  } else if ($d1seconds - $d2seconds < $diff) {
+  } else if ($calcdiff < $diff) {
     /* The times are within the diff */
     <result> true();
   } else {
