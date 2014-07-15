@@ -1,0 +1,92 @@
+version 1.0;
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+ns ext = "http://xmlsoft.org/XSLT/namespace";
+ns date = "http://exslt.org/dates-and-times";
+import "/var/db/scripts/import/junos.xsl";
+
+/* convert month to int */
+template month-name-int($name) {
+  if ($name == "Jan") {
+    <result> "01";
+  } else if ($name == "Feb") {
+    <result> "02";
+  } else if ($name == "Mar") {
+    <result> "03";
+  } else if ($name == "Apr") {
+    <result> "04";
+  } else if ($name == "May") {
+    <result> "05";
+  } else if ($name == "Jun") {
+    <result> "06";
+  } else if ($name == "Jul") {
+    <result> "07";
+  } else if ($name == "Aug") {
+    <result> "08";
+  } else if ($name == "Sep") {
+    <result> "09";
+  } else if ($name == "Oct") {
+    <result> "10";
+  } else if ($name == "Nov") {
+    <result> "11";
+  } else if ($name == "Dec") {
+    <result> "12";
+  } else {
+    /* No match return empty */
+    <result> "";
+  }
+}
+
+/* pad a number with a 0 if it is less than 2 char in length */
+template lpad-zero($date){
+  if (string-length($date) < 2) {
+    <result> "0" _ $date;
+  } else {
+    <result> $date;
+  }
+}
+
+/* convert a timestamp found in show-chassis-cluster-information to iso8601 format */
+template jdate-iso8601($date) {
+  /* Expected format "Jul 11 13:44:09.650" */
+  var $sane = jcs:regex("([A-Za-z]{3}) ([0-9]+) ([0-9]+:[0-9]+:[0-9]+)",normalize-space($date));
+  var $month = {
+    call month-name-int($name = $sane[2]);
+  }
+  var $day = {
+    call lpad-zero() {
+      with $date = $sane[3];
+    }
+  }
+  var $time = $sane[4];
+  var $year = date:year();
+  var $isofmt = $year _ "-" _ $month _ "-" _ $day _ "T" _ $time _ "Z";
+  <result> $isofmt;
+}
+
+/* template that checks if the diff between two times is within the specified diff */
+/* $date1 and $date2 must be in ISO8601 format */
+/* $diff is in seconds */
+template compare-date($date1,$date2,$diff){
+  $d1seconds = date:seconds($date1);
+  $d2seconds = date:seconds($date2);
+  if ($d1seconds - $d2seconds > $diff) {
+    /* The two times are not within the diff */
+    <result> false();
+  } else if ($d1seconds - $d2seconds < $diff) {
+    /* The times are within the diff */
+    <result> true();
+  } else {
+    <result> "";
+  }
+}
+
+match / {
+  <op-script-results> {
+    <output> $isofmt;
+    <output> date:date-time();
+    <output> date:difference($isofmt,"2014");
+    <output> normalize-space($localtime);
+  }
+}
