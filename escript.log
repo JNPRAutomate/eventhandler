@@ -1,0 +1,178 @@
+Jul 17 10:10:16 Firefly-1B.etc.test.gs.com clear-log[3002]: logfile cleared 
+Jul 17 10:11:37 event script processing begins
+Jul 17 10:11:37 reading event details
+Jul 17 10:11:37 testing event details
+Jul 17 10:11:37 running event script 'eventhandler.slax'
+Jul 17 10:11:37 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:11:37 reading event script 'eventhandler.slax'
+Jul 17 10:11:38 event script processing begins
+Jul 17 10:11:38 reading event details
+Jul 17 10:11:38 testing event details
+Jul 17 10:11:38 running event script 'eventhandler.slax'
+Jul 17 10:11:38 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:11:38 reading event script 'eventhandler.slax'
+Jul 17 10:11:38 event script processing begins
+Jul 17 10:11:38 reading event details
+Jul 17 10:11:38 testing event details
+Jul 17 10:11:38 running event script 'eventhandler.slax'
+Jul 17 10:11:38 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:11:38 reading event script 'eventhandler.slax'
+Jul 17 10:11:40 event script output
+Jul 17 10:11:40 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_SET_IP_MON_FAILURE...IP Monitor failed for redundancy-group 2</output>
+<output>IP Monitor failed for rg 2</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 2</output>
+</event-script-results>
+Jul 17 10:11:40 end dump
+Jul 17 10:11:40 inspecting event output 'eventhandler.slax'
+Jul 17 10:11:40 finished event script 'eventhandler.slax'
+Jul 17 10:11:40 event script processing ends
+Jul 17 10:11:40 event script output
+Jul 17 10:11:40 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_SET_IP_MON_FAILURE...IP Monitor failed for redundancy-group 3</output>
+<output>IP Monitor failed for rg 3</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 3</output>
+</event-script-results>
+Jul 17 10:11:40 end dump
+Jul 17 10:11:40 inspecting event output 'eventhandler.slax'
+Jul 17 10:11:40 finished event script 'eventhandler.slax'
+Jul 17 10:11:40 event script processing ends
+Jul 17 10:11:44 event script output
+Jul 17 10:11:44 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_SET_IP_MON_FAILURE...IP Monitor failed for redundancy-group 1</output>
+<output>IP Monitor failed for rg 1</output>
+<output>Monitored RG 1 has failed. Taking action.</output>
+<output>Failure Reason: Control &amp; Fabric links down</output>
+<output>Event at 2014-07-17T04:30:13Z within 30 seconds from now 2014-07-17T10:11:40Z</output>
+<output>Disabling OSPF on interface: reth1.0 Failure Reason: Control &amp; Fabric links down</output>
+
+
+uncommitted changes will be discarded on exit
+
+
+
+
+
+
+
+node1
+
+
+
+<output>Clearing chassis cluster information buffer</output>
+<output>Failure Reason: Preempt/yield (1/100)</output>
+<output>Failure Reason: Back to back failover interval expired</output>
+<output>Failure Reason: Control &amp; Fabric links down</output>
+<output>Event at 2014-07-17T10:11:34Z within 30 seconds from now 2014-07-17T10:11:44Z</output>
+<output>Disabling OSPF on interface: reth1.0 Failure Reason: Control &amp; Fabric links down</output>
+
+
+Configuration database is already open
+
+
+
+
+
+node1
+
+
+
+<output>Clearing chassis cluster information buffer</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 1</output>
+</event-script-results>
+Jul 17 10:11:44 end dump
+Jul 17 10:11:44 inspecting event output 'eventhandler.slax'
+Jul 17 10:11:44 finished event script 'eventhandler.slax'
+Jul 17 10:11:44 event script processing ends
+Jul 17 10:14:30 event script processing begins
+Jul 17 10:14:30 reading event details
+Jul 17 10:14:30 testing event details
+Jul 17 10:14:30 running event script 'eventhandler.slax'
+Jul 17 10:14:30 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:14:30 reading event script 'eventhandler.slax'
+Jul 17 10:14:30 event script processing begins
+Jul 17 10:14:30 reading event details
+Jul 17 10:14:30 testing event details
+Jul 17 10:14:30 running event script 'eventhandler.slax'
+Jul 17 10:14:30 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:14:30 reading event script 'eventhandler.slax'
+Jul 17 10:14:30 event script processing begins
+Jul 17 10:14:30 reading event details
+Jul 17 10:14:30 testing event details
+Jul 17 10:14:30 running event script 'eventhandler.slax'
+Jul 17 10:14:30 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:14:30 reading event script 'eventhandler.slax'
+Jul 17 10:14:30 event script processing begins
+Jul 17 10:14:30 reading event details
+Jul 17 10:14:30 testing event details
+Jul 17 10:14:30 running event script 'eventhandler.slax'
+Jul 17 10:14:30 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:14:30 reading event script 'eventhandler.slax'
+Jul 17 10:14:31 event script output
+Jul 17 10:14:31 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_UNSET_IP_MON_FAILURE...IP Monitor failure recovered for redundancy-group 1</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 1</output>
+</event-script-results>
+Jul 17 10:14:31 end dump
+Jul 17 10:14:31 inspecting event output 'eventhandler.slax'
+Jul 17 10:14:31 finished event script 'eventhandler.slax'
+Jul 17 10:14:31 event script processing ends
+Jul 17 10:14:31 event script output
+Jul 17 10:14:31 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_UNSET_IP_MON_FAILURE...IP Monitor failure recovered for redundancy-group 3</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 3</output>
+</event-script-results>
+Jul 17 10:14:31 end dump
+Jul 17 10:14:31 inspecting event output 'eventhandler.slax'
+Jul 17 10:14:31 finished event script 'eventhandler.slax'
+Jul 17 10:14:31 event script processing ends
+Jul 17 10:14:31 event script output
+Jul 17 10:14:31 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_UNSET_IP_MON_FAILURE...IP Monitor failure recovered for redundancy-group 2</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 2</output>
+</event-script-results>
+Jul 17 10:14:31 end dump
+Jul 17 10:14:31 inspecting event output 'eventhandler.slax'
+Jul 17 10:14:31 finished event script 'eventhandler.slax'
+Jul 17 10:14:31 event script processing ends
+Jul 17 10:14:32 event script output
+Jul 17 10:14:32 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_SET_IP_MON_FAILURE...IP Monitor failed for redundancy-group 3</output>
+<output>IP Monitor failed for rg 3</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 3</output>
+</event-script-results>
+Jul 17 10:14:32 end dump
+Jul 17 10:14:32 inspecting event output 'eventhandler.slax'
+Jul 17 10:14:32 finished event script 'eventhandler.slax'
+Jul 17 10:14:32 event script processing ends
+Jul 17 10:15:21 event script processing begins
+Jul 17 10:15:21 reading event details
+Jul 17 10:15:21 testing event details
+Jul 17 10:15:21 running event script 'eventhandler.slax'
+Jul 17 10:15:21 opening event script '/var/db/scripts/event/eventhandler.slax'
+Jul 17 10:15:21 reading event script 'eventhandler.slax'
+Jul 17 10:15:21 event script output
+Jul 17 10:15:21 begin dump
+<?xml version="1.0"?>
+<output xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">Data check: JSRPD_UNSET_IP_MON_FAILURE...IP Monitor failure recovered for redundancy-group 3</output>
+<event-script-results xmlns:junos="http://xml.juniper.net/junos/*/junos" xmlns:xnm="http://xml.juniper.net/xnm/1.1/xnm" xmlns:jcs="http://xml.juniper.net/junos/commit-scripts/1.0" xmlns:ext="http://xmlsoft.org/XSLT/namespace" xmlns:date="http://exslt.org/dates-and-times">
+  <output>MESSAGE RECEIVED: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 3</output>
+</event-script-results>
+Jul 17 10:15:21 end dump
+Jul 17 10:15:21 inspecting event output 'eventhandler.slax'
+Jul 17 10:15:21 finished event script 'eventhandler.slax'
+Jul 17 10:15:21 event script processing ends

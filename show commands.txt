@@ -1,0 +1,102 @@
+{secondary:node1}
+root@Firefly-1B> show log messages | match JSRPD | match "Jul 17 10:"
+Jul 17 10:11:34.540 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'secondary' to 'primary' state due to Control & Fabric links down
+Jul 17 10:11:34.595 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary' to 'primary' state due to Control & Fabric links down
+Jul 17 10:11:34.665 2014  Firefly-1B jsrpd[1209]: LIBJSNMP_NS_LOG_ERR: ERR: snmpd: send_trap: Failure in sendto (Broken pipe)
+Jul 17 10:11:34.665 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 3 transitioned from 'secondary' to 'primary' state due to Control & Fabric links down
+Jul 17 10:11:34.685 2014  Firefly-1B jsrpd[1209]: LIBJSNMP_NS_LOG_ERR: ERR: snmpd: send_trap: Failure in sendto (Broken pipe)
+Jul 17 10:11:34.745 2014  Firefly-1B jsrpd[1209]: LIBJSNMP_NS_LOG_ERR: ERR: snmpd: send_trap: Failure in sendto (Broken pipe)
+Jul 17 10:11:36.485 2014  Firefly-1B jsrpd[1209]: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 1
+Jul 17 10:11:36.495 2014  Firefly-1B jsrpd[1209]: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 2
+Jul 17 10:11:36.570 2014  Firefly-1B jsrpd[1209]: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 3
+Jul 17 10:14:06.697 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'primary' to 'secondary-hold' state due to Preempt/yield (1/100)
+Jul 17 10:14:06.707 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'primary' to 'secondary-hold' state due to Monitor failed: IP
+Jul 17 10:14:06.712 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 2 transitioned from 'primary' to 'secondary-hold' state due to Monitor failed: IP
+Jul 17 10:14:06.713 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 3 transitioned from 'primary' to 'secondary-hold' state due to Monitor failed: IP
+Jul 17 10:14:07.732 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 1 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expired
+Jul 17 10:14:07.832 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 2 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expired
+Jul 17 10:14:07.842 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 3 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expired
+Jul 17 10:14:18.923 2014  Firefly-1B jsrpd[1209]: JSRPD_SET_SCHED_MON_FAILURE: sched-mon failed: Detected schedule slip
+Jul 17 10:14:29.970 2014  Firefly-1B jsrpd[1209]: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 1
+Jul 17 10:14:29.970 2014  Firefly-1B jsrpd[1209]: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 2
+Jul 17 10:14:29.975 2014  Firefly-1B jsrpd[1209]: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 3
+Jul 17 10:14:29.980 2014  Firefly-1B jsrpd[1209]: JSRPD_SET_IP_MON_FAILURE: IP Monitor failed for redundancy-group 3
+Jul 17 10:15:19.254 2014  Firefly-1B jsrpd[1209]: JSRPD_UNSET_SCHED_MON_FAILURE: sched-mon recovered: Cleared schedule slip
+Jul 17 10:15:19.264 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 2 transitioned from 'secondary' to 'primary' state due to Remote node is in secondary hold
+Jul 17 10:15:20.944 2014  Firefly-1B jsrpd[1209]: JSRPD_UNSET_IP_MON_FAILURE: IP Monitor failure recovered for redundancy-group 3
+Jul 17 10:19:06.713 2014  Firefly-1B jsrpd[1209]: JSRPD_RG_STATE_CHANGE: Redundancy-group 0 transitioned from 'secondary-hold' to 'secondary' state due to Back to back failover interval expired
+
+{secondary:node1}
+root@Firefly-1B> show chassis cluster information
+node0:
+--------------------------------------------------------------------------
+Redundancy mode:
+    Configured mode: active-active
+    Operational mode: active-active
+Cluster configuration:
+    Heartbeat interval: 1000 ms
+    Heartbeat threshold: 3
+    Control link recovery: Enabled
+    Fabric link down timeout: 66 sec
+
+Redundancy group: 0, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 16 23:22:17.817 : hold->secondary, reason: Hold timer expired
+        Jul 16 23:22:19.325 : secondary->primary, reason: Better priority (100/1)
+
+Redundancy group: 1, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 16 23:22:17.818 : hold->secondary, reason: Hold timer expired
+        Jul 16 23:22:19.422 : secondary->primary, reason: Remote yield (0/0)
+
+Redundancy group: 2, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 16 23:59:29.391 : secondary-hold->secondary, reason: Back to back failover interval expired
+        Jul 17 04:09:34.280 : secondary->primary, reason: Control & Fabric links down
+        Jul 17 04:13:17.010 : primary->secondary-hold, reason: Preempt (1/100)
+        Jul 17 04:13:18.025 : secondary-hold->secondary, reason: Back to back failover interval expired
+        Jul 17 04:27:29.931 : secondary->primary, reason: Control & Fabric links down
+        Jul 17 04:30:34.554 : primary->secondary-hold, reason: Preempt (1/100)
+        Jul 17 04:30:35.556 : secondary-hold->secondary, reason: Back to back failover interval expired
+        Jul 17 10:11:34.534 : secondary->primary, reason: Control & Fabric links down
+        Jul 17 10:15:19.254 : primary->secondary-hold, reason: Preempt (1/100)
+        Jul 17 10:15:20.263 : secondary-hold->secondary, reason: Back to back failover interval expired
+
+Redundancy group: 3, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 16 23:22:17.818 : hold->secondary, reason: Hold timer expired
+        Jul 16 23:22:19.477 : secondary->primary, reason: Remote yield (0/0)
+
+node1:
+--------------------------------------------------------------------------
+Redundancy mode:
+    Configured mode: active-active    Operational mode: active-active
+    Cluster configuration:
+    Heartbeat interval: 1000 ms
+    Heartbeat threshold: 3
+    Control link recovery: Enabled
+    Fabric link down timeout: 66 sec
+
+Redundancy group: 0, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 17 10:14:06.697 : primary->secondary-hold, reason: Preempt/yield (1/100)
+        Jul 17 10:19:06.713 : secondary-hold->secondary, reason: Back to back failover interval expired
+
+Redundancy group: 1, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 17 10:14:06.707 : primary->secondary-hold, reason: Monitor failed: IP
+        Jul 17 10:14:07.732 : secondary-hold->secondary, reason: Back to back failover interval expired
+
+Redundancy group: 2, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 17 10:14:06.712 : primary->secondary-hold, reason: Monitor failed: IP
+        Jul 17 10:14:07.832 : secondary-hold->secondary, reason: Back to back failover interval expired
+        Jul 17 10:15:19.264 : secondary->primary, reason: Remote node is in secondary hold
+
+Redundancy group: 3, Threshold: 255, Monitoring failures: none
+    Events:
+        Jul 17 10:14:06.713 : primary->secondary-hold, reason: Monitor failed: IP
+        Jul 17 10:14:07.842 : secondary-hold->secondary, reason: Back to back failover interval expired
+
+{secondary:node1}
+root@Firefly-1B>
