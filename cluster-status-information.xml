@@ -1,10 +1,10 @@
-<rpc-reply xmlns:junos="http://xml.juniper.net/junos/12.1I0/junos">
+<rpc-reply xmlns:junos="http://xml.juniper.net/junos/12.1X46/junos">
     <multi-routing-engine-results>
-
+        
         <multi-routing-engine-item>
-
+            
             <re-name>node0</re-name>
-
+            
             <chassis-cluster-information>
                 <chassis-cluster-redundancy-mode>
                     <configured>active-active</configured>
@@ -13,7 +13,7 @@
                 <chassis-cluster-configuration-information>
                     <heartbeat-interval>1000</heartbeat-interval>
                     <heartbeat-threshold>8</heartbeat-threshold>
-                    <control-link-recovery>Enabled</control-link-recovery>
+                    <control-link-recovery>Disabled</control-link-recovery>
                     <fabric-link-timeout>176</fabric-link-timeout>
                 </chassis-cluster-configuration-information>
                 <redundancy-group-information-list>
@@ -24,8 +24,9 @@
                             <redundancy-group-threshold>255</redundancy-group-threshold>
                         </redundancy-group-monitoring-information>
                         <redundancy-group-state-transition-events>
-                            <redundancy-group-state-transition-event>Jul  7 17:59:58.400 : hold-&gt;secondary, reason: Hold timer expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 18:00:07.745 : secondary-&gt;primary, reason: Better priority (254/1)</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 20:58:05.102 : hold-&gt;secondary, reason: Hold timer expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:02:30.079 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:02:33.681 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
                         </redundancy-group-state-transition-events>
                     </redundancy-group-information>
                     <redundancy-group-information>
@@ -35,16 +36,9 @@
                             <redundancy-group-threshold>255</redundancy-group-threshold>
                         </redundancy-group-monitoring-information>
                         <redundancy-group-state-transition-events>
-                            <redundancy-group-state-transition-event>Jul  7 19:20:49.317 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:20:58.841 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:20:59.960 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:21:01.407 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:47.685 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:48.744 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:50.750 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:56.736 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:57.786 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:59.797 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 20:58:05.109 : hold-&gt;secondary, reason: Hold timer expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:02:30.353 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:02:34.548 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
                         </redundancy-group-state-transition-events>
                     </redundancy-group-information>
                     <redundancy-group-information>
@@ -54,18 +48,19 @@
                             <redundancy-group-threshold>255</redundancy-group-threshold>
                         </redundancy-group-monitoring-information>
                         <redundancy-group-state-transition-events>
-                            <redundancy-group-state-transition-event>Jul  7 17:59:58.401 : hold-&gt;secondary, reason: Hold timer expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 18:00:08.284 : secondary-&gt;primary, reason: Remote yield (0/0)</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 20:58:05.111 : hold-&gt;secondary, reason: Hold timer expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:02:30.423 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:02:34.976 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
                         </redundancy-group-state-transition-events>
                     </redundancy-group-information>
                 </redundancy-group-information-list>
             </chassis-cluster-information>
         </multi-routing-engine-item>
-
+        
         <multi-routing-engine-item>
-
+            
             <re-name>node1</re-name>
-
+            
             <chassis-cluster-information>
                 <chassis-cluster-redundancy-mode>
                     <configured>active-active</configured>
@@ -74,7 +69,7 @@
                 <chassis-cluster-configuration-information>
                     <heartbeat-interval>1000</heartbeat-interval>
                     <heartbeat-threshold>8</heartbeat-threshold>
-                    <control-link-recovery>Enabled</control-link-recovery>
+                    <control-link-recovery>Disabled</control-link-recovery>
                     <fabric-link-timeout>176</fabric-link-timeout>
                 </chassis-cluster-configuration-information>
                 <redundancy-group-information-list>
@@ -85,64 +80,63 @@
                             <redundancy-group-threshold>255</redundancy-group-threshold>
                         </redundancy-group-monitoring-information>
                         <redundancy-group-state-transition-events>
-                            <redundancy-group-state-transition-event>Jul  7 18:00:07.651 : hold-&gt;secondary, reason: Hold timer expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:41:50.625 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:41:57.038 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:42:22.652 : primary-&gt;secondary-hold, reason: Preempt/yield (1/254)</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:11:13.514 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:12:58.970 : primary-&gt;secondary-hold, reason: Preempt/yield (1/254)</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:17:59.026 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:20:32.453 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:20:36.276 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:21:22.447 : primary-&gt;secondary-hold, reason: Preempt/yield (1/254)</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:02.247 : secondary-hold-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:07.300 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:44.454 : primary-&gt;secondary-hold, reason: Preempt/yield (1/254)</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:30:44.521 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
                         </redundancy-group-state-transition-events>
                     </redundancy-group-information>
                     <redundancy-group-information>
                         <redundancy-group-id>1</redundancy-group-id>
                         <redundancy-group-monitoring-information>
-                            <monitoring-failure-string>ip-monitoring</monitoring-failure-string>
-                            <redundancy-group-threshold>0</redundancy-group-threshold>
+                            <monitoring-failure-string>none</monitoring-failure-string>
+                            <redundancy-group-threshold>255</redundancy-group-threshold>
                         </redundancy-group-monitoring-information>
                         <redundancy-group-state-transition-events>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:47.588 : secondary-&gt;primary, reason: Remote yield (1/0)</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:50.606 : primary-&gt;secondary-hold, reason: Preempt (1/254)</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:51.641 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:56.649 : secondary-&gt;primary, reason: Remote yield (1/0)</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:30:59.663 : primary-&gt;secondary-hold, reason: Preempt (1/254)</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:31:00.702 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:41:50.681 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:41:57.231 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:42:22.727 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:42:24.581 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:12:59.025 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:13:00.544 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:20:32.603 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:20:36.816 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:21:22.502 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:21:23.707 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:02.336 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:07.469 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:44.554 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:45.624 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
                         </redundancy-group-state-transition-events>
                     </redundancy-group-information>
                     <redundancy-group-information>
                         <redundancy-group-id>2</redundancy-group-id>
                         <redundancy-group-monitoring-information>
-                            <monitoring-failure-string>ip-monitoring</monitoring-failure-string>
-                            <redundancy-group-threshold>0</redundancy-group-threshold>
+                            <monitoring-failure-string>none</monitoring-failure-string>
+                            <redundancy-group-threshold>255</redundancy-group-threshold>
                         </redundancy-group-monitoring-information>
                         <redundancy-group-state-transition-events>
-                            <redundancy-group-state-transition-event>Jul  7 18:00:07.651 : hold-&gt;secondary, reason: Hold timer expired</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:41:50.720 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:41:57.297 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:42:22.767 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
-                            <redundancy-group-state-transition-event>Jul  7 19:42:24.646 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:12:59.120 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:13:00.549 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:20:32.648 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:20:36.856 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:21:22.567 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:21:23.912 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:02.356 : secondary-&gt;ineligible, reason: Control link failure</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:07.564 : ineligible-&gt;primary, reason: Only node present</redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:44.639 : primary-&gt;secondary-hold, reason: Monitor failed: IP </redundancy-group-state-transition-event>
+                            <redundancy-group-state-transition-event>Jul 29 21:25:45.694 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
                         </redundancy-group-state-transition-events>
                     </redundancy-group-information>
                 </redundancy-group-information-list>
             </chassis-cluster-information>
         </multi-routing-engine-item>
-
+        
     </multi-routing-engine-results>
     <cli>
-        <banner>{secondary-hold:node1}</banner>
+        <banner>{primary:node0}</banner>
     </cli>
 </rpc-reply>
 
-Element='<redundancy-group-state-transition-events>
-  <redundancy-group-state-transition-event>Jul  7 19:20:49.317 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:20:58.841 : primary-&gt;secondary-hold, reason: Monitor failed: IP</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:20:59.960 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:21:01.407 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:30:47.685 : primary-&gt;secondary-hold, reason: Monitor failed: IP</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:30:48.744 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:30:50.750 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:30:56.736 : primary-&gt;secondary-hold, reason: Monitor failed: IP</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:30:57.786 : secondary-hold-&gt;secondary, reason: Back to back failover interval expired</redundancy-group-state-transition-event>
-  <redundancy-group-state-transition-event>Jul  7 19:30:59.797 : secondary-&gt;primary, reason: Remote node is in secondary hold</redundancy-group-state-transition-event>
-</redundancy-group-state-transition-events>'
