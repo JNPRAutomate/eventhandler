@@ -72,22 +72,95 @@ template compare-date($date1,$date2,$diff){
   var $d1seconds = date:seconds($date1);
   var $d2seconds = date:seconds($date2);
   var $calcdiff = $d2seconds - $d1seconds;
-  if ($calcdiff > $diff) {
-    /* The two times are not within the diff */
-    <result> false();
-  } else if ($calcdiff < $diff) {
+  if (($calcdiff <= $diff) and ($calcdiff >= 0)) { /* check both sides of the bounds */
     /* The times are within the diff */
     <result> true();
   } else {
-    <result> "";
+    /* returning false because both conditions failed */
+    <result> false();
   }
 }
 
 match / {
   <op-script-results> {
-    <output> $isofmt;
+
+    var $test-time1 = "Jul 17 18:44:04.776";
+    var $isofmt1 = {
+      call jdate-iso8601($date = $test-time1);
+    }
+    var $test-time2 = "Jul 17 18:44:33.776";
+    var $isofmt2 = {   
+      call jdate-iso8601($date = $test-time2);  
+    }  
+    var $diftest1 = {
+      call compare-date($date1 = $isofmt1,$date2 = $isofmt2,$diff = 30);
+    }
+
+    var $test-time3 = "Jul 17 18:44:04.776";
+    var $isofmt3 = {
+      call jdate-iso8601($date = $test-time3);
+    }
+    var $test-time4 = "Jul 17 18:44:34.776";
+    var $isofmt4 = {   
+      call jdate-iso8601($date = $test-time4);  
+    }  
+    var $diftest2 = {
+      call compare-date($date1 = $isofmt3,$date2 = $isofmt4,$diff = 30);
+    }
+
+    var $test-time5 = "Jul 17 18:44:04.776";
+    var $isofmt5 = {
+      call jdate-iso8601($date = $test-time5);
+    }
+    var $test-time6 = "Jul 17 18:44:35.776";
+    var $isofmt6 = {   
+      call jdate-iso8601($date = $test-time6);  
+    }  
+    var $diftest3 = {
+      call compare-date($date1 = $isofmt5,$date2 = $isofmt6,$diff = 30);
+    }
+
+    var $test-time7 = "Jul 17 18:44:04.776";
+    var $isofmt7 = {
+      call jdate-iso8601($date = $test-time7);
+    }
+    var $test-time8 = "Jul 17 18:43:04.776";
+    var $isofmt8 = {   
+      call jdate-iso8601($date = $test-time8);  
+    }  
+    var $diftest4 = {
+      call compare-date($date1 = $isofmt7,$date2 = $isofmt8,$diff = 30);
+    }
+
+    var $test-time9 = "Jul 17 18:44:04.776";
+    var $isofmt9 = {
+      call jdate-iso8601($date = $test-time9);
+    }
+    var $test-time10 = "Jul 17 18:43:04.776";
+    var $isofmt10 = {   
+      call jdate-iso8601($date = $test-time10);  
+    }  
+    var $diftest5 = {
+      call compare-date($date1 = $isofmt9,$date2 = $isofmt10,$diff = 30);
+    }
+
+    <output> $isofmt1;
+    <output> $isofmt2;
+    <output> "Should be true";
+    <output> $diftest1;
+    <output> $isofmt3;
+    <output> $isofmt4;
+    <output> "Should be true";
+    <output> $diftest2;
+    <output> $isofmt5;
+    <output> $isofmt6;
+    <output> "Should be false";
+    <output> $diftest3;
+    <output> "Should be false";
+    <output> $diftest4;
+    <output> "Should be false";
+    <output> $diftest5;
     <output> date:date-time();
-    <output> date:difference($isofmt,"2014");
     <output> normalize-space($localtime);
   }
 }
