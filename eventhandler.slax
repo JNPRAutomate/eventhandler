@@ -34,28 +34,28 @@ var $eventhandler-config = {
 /* results from pulling config */
 var $config-results = jcs:execute($connection,$eventhandler-config);
 /* RG to watch for RG state changes */
-var $monitored-rg = $results//apply-macro[name="eventhandler"]/data[name="monitored-rg"]/value;
+var $monitored-rg = $config-results//apply-macro[name="eventhandler"]/data[name="monitored-rg"]/value;
 /* OSPF area to disable interface in */
-var $ospf-area = $results//apply-macro[name="eventhandler"]/data[name="ospf-area"]/value;
+var $ospf-area = $config-results//apply-macro[name="eventhandler"]/data[name="ospf-area"]/value;
 /* routing instance OSPF is configured in */
-var $ospf-ri = $results//apply-macro[name="eventhandler"]/data[name="ospf-ri"]/value;
+var $ospf-ri = $config-results//apply-macro[name="eventhandler"]/data[name="ospf-ri"]/value;
 /* max diff in seconds between two events suggested 30 */
-var $event-diff = $results//apply-macro[name="eventhandler"]/data[name="event-diff"]/value;
+var $event-diff = $config-results//apply-macro[name="eventhandler"]/data[name="event-diff"]/value;
 /* max time to sleep once seeing trigger event suggested 5 */
-var $event-sleep = $results//apply-macro[name="eventhandler"]/data[name="event-sleep"]/value;
+var $event-sleep = $config-results//apply-macro[name="eventhandler"]/data[name="event-sleep"]/value;
 /* max diff in sec between events for ip restore suggested 60 */
-var $restore-diff = $results//apply-macro[name="eventhandler"]/data[name="restore-diff"]/value;
+var $restore-diff = $config-results//apply-macro[name="eventhandler"]/data[name="restore-diff"]/value;
 
 /* XML structure used to map information to each node in the cluster */
 var $node-map = {
   <nodes> {
     <node> {
-      <name> "node0";
-      <ospf-int> "reth0.0"; /* Interface to disable on node0 if failure conditions matched */
+      <name> "node0"; /* node0-ospf-int in config */
+      <ospf-int> $config-results//apply-macro[name="eventhandler"]/data[name="node0-ospf-int"]/value; /* Interface to disable on node0 if failure conditions matched */
     }
     <node> {
-      <name> "node1";
-      <ospf-int> "reth1.0"; /* Interface to disable on node1 if failure conditions matched */
+      <name> "node1"; /* node1-ospf-int in config */
+      <ospf-int> $config-results//apply-macro[name="eventhandler"]/data[name="node1-ospf-int"]/value; /* Interface to disable on node1 if failure conditions matched */
     }
   }
 }
@@ -577,7 +577,8 @@ template compare-date($date1,$date2,$diff){
 /* main function */
 match / {
   <output> "EVENTD MESSAGE RECEIVED: " _ $event;
-  if (($monitored-rg == "") or ($ospf-area == "") or ($ospf-ri == "") or ($event-diff == "") or ($event-sleep == "") or ($restore-diff == "")) {
+  var $node-map-nodes = ext:node-set($node-map);
+  if (($node-map-nodes//node[name="node0"]/ospf-int == "") or ($node-map-nodes//node[name="node1"]/ospf-int  == "") or ($monitored-rg == "") or ($ospf-area == "") or ($ospf-ri == "") or ($event-diff == "") or ($event-sleep == "") or ($restore-diff == "")) {
     <output> "Configuration not correctly defined under chassis cluster";
     expr jcs:close($connection);
   } else {
