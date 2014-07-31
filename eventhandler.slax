@@ -146,27 +146,7 @@ template parse-log-message($message) {
 
                 
                 if ((normalize-space($ipmon-failure-reason) == "none") and (normalize-space($ipmon-failure-reason) != "ip-monitoring")) {
-                  /* Don't disable OSFP but change node priorities */
-                  var $node-priorities = {
-                    call get-rg-conf-priorities() {
-                      with $rg-id = "0";
-                    }
-                  }
-                  var $node-priorities-nodes = ext:node-set($node-priorities); 
-
-                  call open-config();
-
-                  <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
-
-                  call set-rg-priorities() {
-                    with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
-                    with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
-                    with $rg-id = "0";
-                  }
-
-                  call commit-config(){
-                    with $message = "OSPF Disabled on interface " _ $nodes//node[name=$node-name]/ospf-int _ " due to IP Monitor failure";
-                  }
+                  /* Don't disable OSFP or change node priorities */
                 } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
                   /* Disable OSFP but dont change node priorities */
                   var $node-priorities = {
@@ -184,10 +164,14 @@ template parse-log-message($message) {
 
                   <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
 
-                  call set-rg-priorities() {
-                    with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
-                    with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
-                    with $rg-id = "0";
+                  if (($old-state == "secondary") and ($new-state == "primary")) {
+                      /* do not flip priorities */
+                  } else {
+                    call set-rg-priorities() {
+                      with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
+                      with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
+                      with $rg-id = "0";
+                    }
                   }
 
                   call commit-config(){
