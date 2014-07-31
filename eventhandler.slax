@@ -14,13 +14,37 @@ var $event = event-script-input/trigger-event/message;
 /* connection to local routing engine */
 var $connection = jcs:open();
 
-/* globals - statically defined */
-var $monitored-rg = "1"; /* RG to watch for RG state changes */
-var $ospf-area = "0.0.0.0"; /* OSPF area to disable interface in */
-var $ospf-ri = "foo"; /* routing instance OSPF is configured in */
-var $event-diff = 30; /* max diff in seconds between two events */
-var $event-sleep = 5; /* max time to sleep once seeing trigger event */
-var $restore-diff = 60; /* max diff in sec between events for ip restore */
+/* rpc to get conf of eventhandler */
+/* inherit="inherit" required to pull config from apply-groups */
+var $eventhandler-config = {
+  <rpc> {
+    <get-configuration inherit="inherit"> {
+      <configuration> {
+        <chassis> {
+          <cluster> {
+            <apply-macro> {
+              <name> "eventhandler";
+            }
+          }
+        }
+      }
+    }
+  }
+}
+/* results from pulling config */
+var $config-results = jcs:execute($connection,$eventhandler-config);
+/* RG to watch for RG state changes */
+var $monitored-rg = $results//apply-macro[name="eventhandler"]/data[name="monitored-rg"]/value;
+/* OSPF area to disable interface in */
+var $ospf-area = $results//apply-macro[name="eventhandler"]/data[name="ospf-area"]/value;
+/* routing instance OSPF is configured in */
+var $ospf-ri = $results//apply-macro[name="eventhandler"]/data[name="ospf-ri"]/value;
+/* max diff in seconds between two events suggested 30 */
+var $event-diff = $results//apply-macro[name="eventhandler"]/data[name="event-diff"]/value;
+/* max time to sleep once seeing trigger event suggested 5 */
+var $event-sleep = $results//apply-macro[name="eventhandler"]/data[name="event-sleep"]/value;
+/* max diff in sec between events for ip restore suggested 60 */
+var $restore-diff = $results//apply-macro[name="eventhandler"]/data[name="restore-diff"]/value;
 
 /* XML structure used to map information to each node in the cluster */
 var $node-map = {
@@ -143,8 +167,6 @@ template parse-log-message($message) {
                   call commit-config(){
                     with $message = "OSPF Disabled on interface " _ $nodes//node[name=$node-name]/ospf-int _ " due to IP Monitor failure";
                   }
-                  /* <output> "Clearing chassis cluster information buffer"; */
-                  /* call clear-cluster-information(); */
                 } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
                   /* Disable OSFP but dont change node priorities */
                   var $node-priorities = {
@@ -255,8 +277,6 @@ template parse-log-message($message) {
 								call commit-config(){
 									with $message = "OSPF Enabled on interface " _ $nodes//node[name=$node-name]/ospf-int _ " due to IP Monitor recovery";
 								}
-								/* <output> "Clearing chassis cluster information buffer"; */
-								/* call clear-cluster-information(); */
               } else {
                 /* event outside of time window */
 								<output> "Event at " _ $isofmt _ " outside of window " _ $event-diff _ " seconds from now " _ $current-time;
@@ -279,50 +299,6 @@ template parse-log-message($message) {
     /* Message doesn't match */
     <output> "Type: " _ $type _ " and Message: " _ $data _ "not matched. No action taken";
   }
-}
-
-/* function to disable ospf of a specific interface*/
-template disable-ospf-interface($interface){
-  var $rpc = {
-    <load-configuration> {
-      <configuration> {
-        <protocols> {
-          <ospf> {
-            <area> {
-              <name> $ospf-area;
-              <interface> {
-                <name> $interface;
-                <disable>;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  expr jcs:execute($connection,$rpc);
-}
-
-/* function to enable ospf of a specific interface*/
-template enable-ospf-interface($interface){
-  var $rpc = {
-    <load-configuration> {
-      <configuration> {
-        <protocols> {
-          <ospf> {
-            <area> {
-              <name> $ospf-area;
-              <interface> {
-                <name> $interface;
-                <disable>;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  expr jcs:execute($connection,$rpc);
 }
 
 /* function to disable ospf of a specific interface*/
@@ -428,14 +404,6 @@ template get-rg-failures($node-name,$rg-id){
       copy-of ext:node-set($failure-messages);
     }
   }
-}
-
-/* function to clear chassis cluster information */
-template clear-cluster-information(){
-  var $rpc = {
-    <clear-chassis-cluster-information>;
-  }
-  var $results = jcs:execute($connection,$rpc);
 }
 
 /* function to get chassis cluster status*/
@@ -605,15 +573,21 @@ template compare-date($date1,$date2,$diff){
     <result> "false";
   }
 }
+
 /* main function */
 match / {
-  /* Determine who I am
-
-  */
-  call parse-log-message(){
-    with $message = $event;
+  <output> "EVENTD MESSAGE RECEIVED: " _ $event;
+  if (($monitored-rg == "") or ($ospf-area == "") or ($ospf-ri == "") or ($event-diff == "") or ($event-sleep == "") or ($restore-diff == "")) {
+    <output> "Configuration not correctly defined under chassis cluster";
+    expr jcs:close($connection);
+  } else {
+    <output> "Configuration correctly defined";
+    call parse-log-message(){
+      with $message = $event;
+    }
   }
+
   <event-script-results> {
-    <output> "EVENTD MESSAGE RECEIVED: " _ $event;
+    <output> "EVENTD Message Processing Complete";
   }
 }

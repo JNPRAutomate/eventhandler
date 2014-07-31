@@ -1,0 +1,45 @@
+version 1.0;
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+ns ext = "http://xmlsoft.org/XSLT/namespace";
+ns date = "http://exslt.org/dates-and-times";
+import "/var/db/scripts/import/junos.xsl";
+
+var $connection = jcs:open();
+
+var $eventhandler-config = {
+  <rpc> {
+    <get-configuration> {
+      <configuration> {
+        <chassis> {
+          <cluster> {
+            <apply-macro> {
+              <name> "eventhandler";
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+var $results = jcs:execute($connection,$eventhandler-config);
+var $monitored-rg = $results//apply-macro[name="eventhandler"]/data[name="monitored-rg"]/value;
+var $ospf-area = $results//apply-macro[name="eventhandler"]/data[name="ospf-area"]/value;
+var $ospf-ri = $results//apply-macro[name="eventhandler"]/data[name="ospf-ri"]/value;
+var $event-diff = $results//apply-macro[name="eventhandler"]/data[name="event-diff"]/value;
+var $restore-diff = $results//apply-macro[name="eventhandler"]/data[name="restore-diff"]/value;
+if (($monitored-rg == "") or ($ospf-area == "") or ($ospf-ri == "") or ($event-diff == "") or ($restore-diff == "")) {
+  <output> "Configuration not correctly defined under chassis cluster";
+  expr jcs:close($connection);
+} else {
+  <output> "Configuration correctly defined";
+}
+
+match / {
+  <output> "MESSAGE RECEIVED";
+  <op-script-results> {
+    <output> "Run complete";
+  }
+}
