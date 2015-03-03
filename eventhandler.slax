@@ -53,10 +53,12 @@ var $node-map = {
   <nodes> {
     <node> {
       <name> "node0"; /* node0-ospf-int in config */
+      <node-id> "0";
       <ospf-int> $config-results//apply-macro[name="eventhandler"]/data[name="node0-ospf-int"]/value; /* Interface to disable on node0 if failure conditions matched */
     }
     <node> {
       <name> "node1"; /* node1-ospf-int in config */
+      <node-id> "1";
       <ospf-int> $config-results//apply-macro[name="eventhandler"]/data[name="node1-ospf-int"]/value; /* Interface to disable on node1 if failure conditions matched */
     }
   }
@@ -96,6 +98,7 @@ template parse-log-message($message) {
             with $rg-id = "0";
           }
         }
+
         var $rg-status-nodes = ext:node-set($rg-status);
         var $nodes = ext:node-set($node-map);
         /* Validate that the state is now primary for rg 0 */
@@ -179,12 +182,12 @@ template parse-log-message($message) {
                       /* do not flip priorities */
                   } else {
                     /* change node priorities */
+                    <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
                     call set-rg-priorities() {
                       with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
                       with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
                       with $rg-id = "0";
                     }
-                    <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
                   }
 
                   call commit-config(){
@@ -205,7 +208,50 @@ template parse-log-message($message) {
           /* node state not matched to required state */
           <output> "Node state " _ $rg-status-nodes//node[name=$node-name]/status _ " does not match, skipping.";
         }
+      } else if ($follow-the-leader-rg == $rg-group) {
+        /* follow the leader checking */
+        <output> "Checking the follow the leader status of redundancy group: " _ $follow-the-leader-rg;
 
+        var $node-name = {
+          call get-local-node();
+        }
+        var $nodes = ext:node-set($node-map);
+
+        /* $node-name; local node determined earlier */
+        var $rg0-status = {
+          call get-rg-status() {
+            with $rg-id = "0";
+          }
+        }
+        var $rg0-status-nodes = ext:node-set($rg0-status);
+
+        /* get status of the FTL rg */
+        var $rgftl-status = {
+          call get-rg-status() {
+            with $rg-id = $follow-the-leader-rg;
+          }
+        }
+        var $rgftl-status-nodes = ext:node-set($rgftl-status);
+
+        /* Validate that the state is now primary for rg 0 */
+        if (("primary" != $rg0-status-nodes//node[name=$node-name]/status) and ("primary" == $rgftl-status-nodes//node[name=$node-name]/status)) {
+          /* node is not primary for RG0 but is primary for FTLRG */
+          <output> "Node is not primary for RG0 but is primary for redundancy group " _ $follow-the-leader-rg _ " requesting failover";
+          
+          call request-rg-failover() {
+            with $node = $nodes//node[name=$node-name]/node-id;
+            with $redundancy-group = "0";
+          }
+
+          <output> "Resetting maual failover for redundancy group " _ $follow-the-leader-rg;
+          /* reset manual failover */
+          call reset-failover-flag() {
+            with $redundancy-group = "0";
+          }
+
+        } else {
+          /* node does not match conditions to initate follow the leader */
+        }
       } else {
         /* rg not monitored */
         <output> "RG " _ $rg-group _ " not monitored, skipping.";
@@ -583,6 +629,31 @@ template compare-date($date1,$date2,$diff){
     <result> "false";
   }
 }
+
+/* reset fail over flag */
+template reset-failover-flag($redundancy-group) {
+  var $rpc = {
+    <request-chassis-cluster-failover-reset> {
+      <redundancy-group> $redundancy-group;
+    }
+  }
+  expr jcs:execute($connection, $rpc);
+  /* sleep for command to take affect */
+  expr jcs:sleep(1,000);
+}
+
+/* request rg failover */
+template request-rg-failover($node,$redundancy-group) {
+  var $rpc = {
+    <request-chassis-cluster-failover> {
+      <redundancy-group> $redundancy-group;
+      <node> $node;
+    }
+  }
+  expr jcs:execute($connection, $rpc);
+  /* sleep for command to take affect */
+  expr jcs:sleep(1,000);
+}   
 
 /* main function */
 match / {
