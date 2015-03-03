@@ -45,6 +45,8 @@ var $event-diff = $config-results//apply-macro[name="eventhandler"]/data[name="e
 var $event-sleep = $config-results//apply-macro[name="eventhandler"]/data[name="event-sleep"]/value;
 /* max diff in sec between events for ip restore suggested 60 */
 var $restore-diff = $config-results//apply-macro[name="eventhandler"]/data[name="restore-diff"]/value;
+/* redundancy group for control plane or RG 0 to follow in the event of a failover */
+var $follow-the-leader-rg = $config-results//apply-macro[name="eventhandler"]/data[name="follow-the-leader"]/value;
 
 /* XML structure used to map information to each node in the cluster */
 var $node-map = {
@@ -68,15 +70,19 @@ template parse-log-message($message) {
   var $rg-state-change = "JSRPD_RG_STATE_CHANGE";
   var $ip-mon-fail = "JSRPD_SET_IP_MON_FAILURE";
   var $ip-mon-up = "JSRPD_UNSET_IP_MON_FAILURE";
+
+  /* use regex to break apart message */
   var $sane = jcs:regex("(.*): (.*)",normalize-space($message));
   var $type = normalize-space($sane[2]);
   var $data = normalize-space($sane[3]);
+
   if ($type == $rg-state-change) {
     /* Redundancy group state change JSRPD_RG_STATE_CHANGE */
     var $rg-group-regex = jcs:regex("Redundancy-group ([0-9]+) transitioned from '([a-zA-Z\-]*)' to '([a-zA-Z\-]*)' state due to (.*)",$data);
     var $rg-group = $rg-group-regex[2];
     var $old-rg-state = $rg-group-regex[3];
     var $new-rg-state = $rg-group-regex[4];
+
     if ($rg-group != "") {
       <output> "Redundancy group " _ $rg-group _ " transitioned state";
       if ($monitored-rg == $rg-group) {
@@ -92,7 +98,7 @@ template parse-log-message($message) {
         }
         var $rg-status-nodes = ext:node-set($rg-status);
         var $nodes = ext:node-set($node-map);
-        /* Validate that the state is now primary for rg 0*/
+        /* Validate that the state is now primary for rg 0 */
         if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
           var $failures = {
             call get-rg-failures() {
@@ -102,15 +108,18 @@ template parse-log-message($message) {
           }
           var $failures-nodes = ext:node-set($failures);
           var $logs = ext:node-set($failures-nodes//logs//*);
+
           for-each($logs) {
+            /* loop through chassis cluster log messages */
             var $line = normalize-space(.);
             var $new-line = jcs:regex("(.*) : (.*)->(.*), reason: (.*)",$line);
             var $time = normalize-space($new-line[2]);
             var $old-state = $new-line[3];
             var $new-state = $new-line[4];
             var $failure-reason = normalize-space($new-line[5]);
-            if ((normalize-space($failure-reason) == "Control link failure") or (normalize-space($failure-reason) == "Control & Fabric links down")) {
 
+            if ((normalize-space($failure-reason) == "Control link failure") or (normalize-space($failure-reason) == "Control & Fabric links down")) {
+              /* failure reason was a Control link failure or Control & Fabric links down */
               <output> "Failure Reason: " _ $failure-reason _ " detected";
               var $current-time = date:date-time();
 
@@ -131,7 +140,8 @@ template parse-log-message($message) {
               if ($within-window == "true") {
                 /* event matched, checking for ip mon failure */
                 <output> "Checking for IP Monitor Failure";
-                /* waiting to check if ip mon failure occured */
+
+                /* waiting to check if ip mon failure occured also */
                 expr jcs:sleep($event-sleep);
 
                 var $ipmon-failures = {
@@ -147,8 +157,11 @@ template parse-log-message($message) {
                 
                 if ((normalize-space($ipmon-failure-reason) == "none") and (normalize-space($ipmon-failure-reason) != "ip-monitoring")) {
                   /* Don't disable OSFP or change node priorities */
+                  /* no IP mon failure detected */
                 } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
-                  /* Disable OSFP but dont change node priorities */
+                  /* Disable OSFP */
+                  
+                  /* get current node priorities */
                   var $node-priorities = {
                     call get-rg-conf-priorities() {
                       with $rg-id = "0";
@@ -162,32 +175,37 @@ template parse-log-message($message) {
                     with $interface = $nodes//node[name=$node-name]/ospf-int;
                   }
 
-                  <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
-
                   if (($old-state == "secondary") and ($new-state == "primary")) {
                       /* do not flip priorities */
                   } else {
+                    /* change node priorities */
                     call set-rg-priorities() {
                       with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
                       with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
                       with $rg-id = "0";
                     }
+                    <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
                   }
 
                   call commit-config(){
                     with $message = "OSPF Disabled on interface " _ $nodes//node[name=$node-name]/ospf-int _ " due to IP Monitor failure";
                   }
+
                 } else {
+                  /* ip monitor faulure not matched */
                   <output> "Event: " _ $ipmon-failure-reason _ " not matched ";
                 }
               } else {
+                /* ip mon failure detected but not within approved window */
                 <output> "Event: " _ $failure-reason _ " at " _ $isofmt _ " outside of window " _ $event-diff _ " seconds from now " _ $current-time;
               }
             }
           }
         } else {
+          /* node state not matched to required state */
           <output> "Node state " _ $rg-status-nodes//node[name=$node-name]/status _ " does not match, skipping.";
         }
+
       } else {
         /* rg not monitored */
         <output> "RG " _ $rg-group _ " not monitored, skipping.";
@@ -196,11 +214,14 @@ template parse-log-message($message) {
       /* rg group not set */
       <output> "RG not determined, skipping.";
     }
+
   } else if ($type == $ip-mon-up) {
-    /* IP Monitor failure recovered JSRPD_UNSET_IP_MON_FAILURE*/
+    /* IP Monitor failure recovered JSRPD_UNSET_IP_MON_FAILURE */
     var $rg-group-regex = jcs:regex("IP Monitor failure recovered for redundancy-group ([0-9]+)",$data);
 	  var $rg-group = $rg-group-regex[2];
+
     if ($rg-group != "") {
+      /* redundancy group id detected */
       <output> "IP Monitor failure recovered for rg " _ $rg-group;
       if ($monitored-rg == $rg-group) {
         <output> "Failed monitored RG " _ $monitored-rg _ " has recovered. Taking action.";
@@ -237,12 +258,14 @@ template parse-log-message($message) {
               <output> "RG State change Reason: " _ $rg-state-change-reason;
               var $current-time = date:date-time();
 
+              /* convert datetie to iso8601 format */
               var $isofmt = {
 								call jdate-iso8601() {
 									with $date = $time;
 								}
 							}
 
+              /* calculate window between current time and event time */
 							var $within-window = {
 								call compare-date(){
 									with $date1 = $isofmt;
@@ -250,6 +273,7 @@ template parse-log-message($message) {
 									with $diff = $restore-diff;
 								}
 							}
+
               /* only execute on first itteration since for-each loops happen concurrently and no sigular message identifed */
               if ($within-window == "true") {
                 <output> "Event at " _ $isofmt _ " within " _ $event-diff _ " seconds from now " _ $current-time;
@@ -284,6 +308,8 @@ template parse-log-message($message) {
     <output> "Type: " _ $type _ " and Message: " _ $data _ "not matched. No action taken";
   }
 }
+
+/* Helper functions */
 
 /* function to disable ospf of a specific interface*/
 template disable-ospf-interface-ri($interface){
