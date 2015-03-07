@@ -179,8 +179,6 @@ template parse-log-message($message) {
                   }
 
                   if (($old-state == "secondary") and ($new-state == "primary")) {
-                      /* do not flip priorities */
-                  } else {
                     /* change node priorities */
                     <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
                     call set-rg-priorities() {
@@ -282,64 +280,59 @@ template parse-log-message($message) {
         var $rg-status-nodes = ext:node-set($rg-status);
 				var $nodes = ext:node-set($node-map);
         /* check to see that rg 0 is in primary state */
-				if ("primary" != $rg-status-nodes//node[name=$node-name]/status) {
-          var $chassis-cluster-info = {
-						call get-rg-failures() {
-							with $node-name = $node-name;
-							with $rg-id = "0";
-							/* with $rg-id = $monitored-rg; */
-						}
-					}
-          var $chassis-cluster-info-nodes = ext:node-set($chassis-cluster-info);
-					var $logs = ext:node-set($chassis-cluster-info-nodes//logs//*);
-          for-each($logs) {
-            var $line = normalize-space(.);
-						var $new-line = jcs:regex("(.*) : (.*)->(.*), reason: (.*)",$line);
-						var $time = normalize-space($new-line[2]);
-						var $old-state = $new-line[3];
-						var $new-state = $new-line[4];
-						var $rg-state-change-reason = normalize-space($new-line[5]);
+        var $chassis-cluster-info = {
+  				call get-rg-failures() {
+  					with $node-name = $node-name;
+  					with $rg-id = "0";
+  					/* with $rg-id = $monitored-rg; */
+  				}
+  			}
+        var $chassis-cluster-info-nodes = ext:node-set($chassis-cluster-info);
+  			var $logs = ext:node-set($chassis-cluster-info-nodes//logs//*);
+        for-each($logs) {
+          var $line = normalize-space(.);
+  				var $new-line = jcs:regex("(.*) : (.*)->(.*), reason: (.*)",$line);
+  				var $time = normalize-space($new-line[2]);
+  				var $old-state = $new-line[3];
+  				var $new-state = $new-line[4];
+  				var $rg-state-change-reason = normalize-space($new-line[5]);
 
-            <output> "RG State change Reason: " _ $rg-state-change-reason;
-            var $current-time = date:date-time();
+          <output> "RG State change Reason: " _ $rg-state-change-reason;
+          var $current-time = date:date-time();
 
-            /* convert datetie to iso8601 format */
-            var $isofmt = {
-							call jdate-iso8601() {
-								with $date = $time;
-							}
-						}
+          /* convert datetie to iso8601 format */
+          var $isofmt = {
+  					call jdate-iso8601() {
+  						with $date = $time;
+  					}
+  				}
 
-            /* calculate window between current time and event time */
-						var $within-window = {
-							call compare-date(){
-								with $date1 = $isofmt;
-								with $date2 = $current-time; /* current time */
-								with $diff = $restore-diff;
-							}
-						}
+          /* calculate window between current time and event time */
+  				var $within-window = {
+  					call compare-date(){
+  						with $date1 = $isofmt;
+  						with $date2 = $current-time; /* current time */
+  						with $diff = $restore-diff;
+  					}
+  				}
 
-            /* only execute on first itteration since for-each loops happen concurrently and no sigular message identifed */
-            if ($within-window == "true") {
-              <output> "Event at " _ $isofmt _ " within " _ $event-diff _ " seconds from now " _ $current-time;
-							<output> "Enabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " RG change reason: " _ $rg-state-change-reason;
-							call open-config();
-							call enable-ospf-interface-ri(){
-								with $interface = $nodes//node[name=$node-name]/ospf-int;
-							}
-							call commit-config(){
-								with $message = "OSPF Enabled on interface " _ $nodes//node[name=$node-name]/ospf-int _ " due to IP Monitor recovery";
-							}
-            } else {
-              /* event outside of time window */
-							<output> "Event at " _ $isofmt _ " outside of window " _ $event-diff _ " seconds from now " _ $current-time;
-            } /* end time window check */
-            /* end check on rg state change failure conditions */
-          } /* end foreach statement */
-        } else {
-          /* end check on primary rg state */
-          <output> "Node state " _ $rg-status-nodes//node[name=$node-name]/status _ " does not match, skipping.";
-        }
+          /* only execute on first itteration since for-each loops happen concurrently and no sigular message identifed */
+          if ($within-window == "true") {
+            <output> "Event at " _ $isofmt _ " within " _ $event-diff _ " seconds from now " _ $current-time;
+  					<output> "Enabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " RG change reason: " _ $rg-state-change-reason;
+  					call open-config();
+  					call enable-ospf-interface-ri(){
+  						with $interface = $nodes//node[name=$node-name]/ospf-int;
+  					}
+  					call commit-config(){
+  						with $message = "OSPF Enabled on interface " _ $nodes//node[name=$node-name]/ospf-int _ " due to IP Monitor recovery";
+  					}
+          } else {
+            /* event outside of time window */
+  					<output> "Event at " _ $isofmt _ " outside of window " _ $event-diff _ " seconds from now " _ $current-time;
+          } /* end time window check */
+          /* end check on rg state change failure conditions */
+        } /* end foreach statement */
       } else {
         /* rg group not monitored */
         <output> "RG " _ $rg-group _ " not monitored, skipping.";
