@@ -8,6 +8,21 @@ import "/var/db/scripts/import/junos.xsl";
 
 /* globals */
 
+/*
+
+  ISSUES!!!
+
+  Node 0 Southbound link shut
+  1) Node 0 priority does flip for RG-0 - ACK as it would because the logic path
+  2) Node 0 reth0.0 OSPF is disabled - ACK as it would because of the logic path
+  3) Node 1 does not flip the RG-0 priority - ACK the script is NOT activating on the secondary node
+
+  Node 0 Southbound link restoration
+  1) Since both node0 and 1 report a priority of 1 for RG-0 the control plane shuts down on node 1 and changes to node 0 - TODO: SWAP PRIORITIES ON NODE1 
+  2) OSPF does not re-enable on node 0 reth0.0 - THIS IS NOT BEING TRIGGERED TODO: Determine why this isnt being triggered
+
+*/
+
 /* event message recieved from the event engine */
 var $event = event-script-input/trigger-event/message;
 
@@ -178,6 +193,9 @@ template parse-log-message($message) {
                     with $interface = $nodes//node[name=$node-name]/ospf-int;
                   }
 
+                  /*
+                    TODO: Both nodes need to flip priorities as it is assumed that they have seperated and we need the same priorities to be reflected
+                  */
                   if (($old-state == "secondary") and ($new-state == "primary")) {
                     /* change node priorities */
                     <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
