@@ -332,7 +332,7 @@ template parse-log-message($message) {
 
           /* only execute on first itteration since for-each loops happen concurrently and no sigular message identifed */
           if ($within-window == "true") {
-            <output> "Event at " _ $isofmt _ " within " _ $event-diff _ " seconds from now " _ $current-time;
+            <output> "Event at " _ $isofmt _ " within " _ $restore-diff _ " seconds from now " _ $current-time;
   					<output> "Enabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " RG change reason: " _ $rg-state-change-reason;
   					call open-config();
   					call enable-ospf-interface-ri(){
