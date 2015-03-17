@@ -175,6 +175,7 @@ template parse-log-message($message) {
                 
                 if ((normalize-space($ipmon-failure-reason) == "none") and (normalize-space($ipmon-failure-reason) != "ip-monitoring")) {
                   /* Don't disable OSFP or change node priorities */
+                  /* Disable OSFP */
                   /* no IP mon failure detected */
                   var $node-priorities = {
                     call get-rg-conf-priorities() {
@@ -191,20 +192,6 @@ template parse-log-message($message) {
                     with $rg-id = "0";
                   }
 
-                  call commit-config(){
-                    with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
-                  }
-
-                } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
-                  /* Disable OSFP */
-                  var $node-priorities = {
-                    call get-rg-conf-priorities() {
-                      with $rg-id = "0";
-                    }
-                  }
-                  var $node-priorities-nodes = ext:node-set($node-priorities);
-                  call open-config();
-
                   if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
                     /* Only disable OSPF if node is primary */
                     <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
@@ -212,6 +199,19 @@ template parse-log-message($message) {
                       with $interface = $nodes//node[name=$node-name]/ospf-int;
                     }
                   }
+
+                  call commit-config(){
+                    with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
+                  }
+
+                } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
+                  var $node-priorities = {
+                    call get-rg-conf-priorities() {
+                      with $rg-id = "0";
+                    }
+                  }
+                  var $node-priorities-nodes = ext:node-set($node-priorities);
+                  call open-config();
 
                   /* change node priorities */
                   <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
@@ -316,8 +316,8 @@ template parse-log-message($message) {
         var $chassis-cluster-info = {
   				call get-rg-failures() {
   					with $node-name = $node-name;
-  					with $rg-id = "0";
-  					/* with $rg-id = $monitored-rg; */
+  					/* with $rg-id = "0"; */
+  					with $rg-id = $monitored-rg;
   				}
   			}
         var $chassis-cluster-info-nodes = ext:node-set($chassis-cluster-info);
@@ -362,7 +362,7 @@ template parse-log-message($message) {
   					}
           } else {
             /* event outside of time window */
-  					<output> "Event at " _ $isofmt _ " outside of window " _ $event-diff _ " seconds from now " _ $current-time;
+  					<output> "Event at " _ $isofmt _ " outside of window " _ $restore-diff _ " seconds from now " _ $current-time;
           } /* end time window check */
           /* end check on rg state change failure conditions */
         } /* end foreach statement */
