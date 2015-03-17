@@ -117,7 +117,7 @@ template parse-log-message($message) {
         var $rg-status-nodes = ext:node-set($rg-status);
         var $nodes = ext:node-set($node-map);
         /* Validate that the state is now primary for rg 0 */
-        if ("primary" == $rg-status-nodes//node[name=$node-name]/status) { /* TODO: CHANGE TO EITHER STATE */
+        if (("primary" == $rg-status-nodes//node[name=$node-name]/status) or ("secondary" == $rg-status-nodes//node[name=$node-name]/status) or ("secondary-hold" == $rg-status-nodes//node[name=$node-name]/status)) {
           var $failures = {
             call get-rg-failures() {
               with $node-name = $node-name;
@@ -176,6 +176,25 @@ template parse-log-message($message) {
                 if ((normalize-space($ipmon-failure-reason) == "none") and (normalize-space($ipmon-failure-reason) != "ip-monitoring")) {
                   /* Don't disable OSFP or change node priorities */
                   /* no IP mon failure detected */
+                  var $node-priorities = {
+                    call get-rg-conf-priorities() {
+                      with $rg-id = "0";
+                    }
+                  }
+                  var $node-priorities-nodes = ext:node-set($node-priorities);
+                  call open-config();
+                                    /* change node priorities */
+                  <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
+                  call set-rg-priorities() {
+                    with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
+                    with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
+                    with $rg-id = "0";
+                  }
+
+                  call commit-config(){
+                    with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
+                  }
+
                 } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
                   /* Disable OSFP */
                   var $node-priorities = {
