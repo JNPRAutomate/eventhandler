@@ -192,14 +192,6 @@ template parse-log-message($message) {
                     with $rg-id = "0";
                   }
 
-                  if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
-                    /* Only disable OSPF if node is primary */
-                    <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
-                    call disable-ospf-interface-ri(){
-                      with $interface = $nodes//node[name=$node-name]/ospf-int;
-                    }
-                  }
-
                   call commit-config(){
                     with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
                   }
@@ -219,6 +211,14 @@ template parse-log-message($message) {
                     with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
                     with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
                     with $rg-id = "0";
+                  }
+
+                  if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
+                    /* Only disable OSPF if node is primary */
+                    <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
+                    call disable-ospf-interface-ri(){
+                      with $interface = $nodes//node[name=$node-name]/ospf-int;
+                    }
                   }
 
                   call commit-config(){
