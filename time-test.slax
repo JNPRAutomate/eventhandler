@@ -81,8 +81,6 @@ template compare-date($date1,$date2,$diff){
   }
 }
 
-match / {
-  <op-script-results> {
 
     var $test-time1 = "Jul 17 18:44:04.776";
     var $isofmt1 = {
