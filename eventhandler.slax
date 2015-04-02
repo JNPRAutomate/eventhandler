@@ -177,8 +177,10 @@ template parse-log-message($message) {
                   /* Don't disable OSFP or change node priorities */
                   /* Disable OSFP */
                   /* no IP mon failure detected */
-                      var $node-name = {
-                        call get-local-node();
+                      var $node-priorities = {
+                        call get-rg-conf-priorities() {
+                          with $rg-id = "0";
+                        }
                       }
 
                       <output> "Checking status of fabric links";
@@ -216,7 +218,7 @@ template parse-log-message($message) {
                         <output> "Fabic link fab1 on node1 is " _ $op-status;
                         if ($op-status == "up") {
                           /* if interface is down not swap priorities */
-                          <output> "Fabic link fab0 on node0 is " _ $op-status _ "taking action";
+                          <output> "Fabic link fab0 on node1 is " _ $op-status _ " taking action";
                           var $node-priorities-nodes = ext:node-set($node-priorities);
                           call open-config();
                           
@@ -236,41 +238,89 @@ template parse-log-message($message) {
                             <output> "Fabic link fab1 on node1 is " _ $op-status _ "not taking action";
                         }
                     }
-                  var $node-priorities = {
-                    call get-rg-conf-priorities() {
-                      with $rg-id = "0";
-                    }
-                  }
-
                 } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
-                  var $node-priorities = {
-                    call get-rg-conf-priorities() {
-                      with $rg-id = "0";
+                      var $node-priorities = {
+                        call get-rg-conf-priorities() {
+                          with $rg-id = "0";
+                        }
+                      }
+
+                      <output> "Checking status of fabric links";
+                      /* check interface status */
+                    if ($node-name  == "node0") {
+                      var $op-status = {
+                      call check-int-status($interface = "fab0");
+                      }
+                      <output> "Fabic link fab0 on node0 is " _ $op-status;
+                      if ($op-status == "up") {
+                          /* if interface is up do not swap priorities */
+                          <output> "Fabic link fab0 on node0 is " _ $op-status _ "not taking action";
+                      } else if ($op-status == "down") {
+                        /* if interface is down not swap priorities */
+                        <output> "Fabic link fab0 on node0 is " _ $op-status _ "taking action";
+                        var $node-priorities-nodes = ext:node-set($node-priorities);
+                        call open-config();
+                        
+                        /* change node priorities */
+                        <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
+                        call set-rg-priorities() {
+                          with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
+                          with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
+                          with $rg-id = "0";
+                        }
+
+                        if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
+                          /* Only disable OSPF if node is primary */
+                          <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
+                          call disable-ospf-interface-ri(){
+                            with $interface = $nodes//node[name=$node-name]/ospf-int;
+                          }
+                        }
+
+                        call commit-config(){
+                          with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
+                        }
+                      }
+                    } else if ($node-name  == "node1") {
+                        var $op-status = {
+                          call check-int-status($interface = "fab1");
+                        }
+                        <output> "Fabic link fab1 on node1 is " _ $op-status;
+                        if ($op-status == "up") {
+                          /* if interface is down not swap priorities */
+                          <output> "Fabic link fab0 on node1 is " _ $op-status _ " taking action";
+                          var $node-priorities-nodes = ext:node-set($node-priorities);
+                          call open-config();
+                          
+                          /* change node priorities */
+                          <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
+                          call set-rg-priorities() {
+                            with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
+                            with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
+                            with $rg-id = "0";
+                          }
+
+                          call commit-config(){
+                            with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
+                          }
+                        } else if ($op-status == "down") {
+                            /* if interface is up do not swap priorities */
+                            <output> "Fabic link fab1 on node1 is " _ $op-status _ "not taking action";
+                            
+                          if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
+                            /* Only disable OSPF if node is primary */
+                            call open-config();
+
+                            <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
+                            call disable-ospf-interface-ri(){
+                              with $interface = $nodes//node[name=$node-name]/ospf-int;
+                            }
+                            call commit-config(){
+                              with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
+                            }
+                          }
+                        }
                     }
-                  }
-                  var $node-priorities-nodes = ext:node-set($node-priorities);
-                  call open-config();
-
-                  /* change node priorities */
-                  <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
-                  call set-rg-priorities() {
-                    with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
-                    with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
-                    with $rg-id = "0";
-                  }
-
-                  if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
-                    /* Only disable OSPF if node is primary */
-                    <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
-                    call disable-ospf-interface-ri(){
-                      with $interface = $nodes//node[name=$node-name]/ospf-int;
-                    }
-                  }
-
-                  call commit-config(){
-                    with $message = "Changing node priorities node0: " _ $node-priorities-nodes//node[name="node1"]/priority _ "  node1: "  _ $node-priorities-nodes//node[name="node1"]/priority;
-                  }
-
                 } else {
                   /* ip monitor faulure not matched */
                   <output> "Event: " _ $ipmon-failure-reason _ " not matched ";
@@ -331,7 +381,7 @@ template parse-log-message($message) {
         }
       } else {
         /* rg not monitored */
-        <output> "RG " _ $rg-group _ " not monitored, skipping.";
+        <output> "RG " _ $rg-group _ " NOT monitored, skipping.";
       }
     } else {
       /* rg group not set */
