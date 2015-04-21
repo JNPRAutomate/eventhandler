@@ -1,0 +1,62 @@
+version 1.0;
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+ns ext = "http://xmlsoft.org/XSLT/namespace";
+ns date = "http://exslt.org/dates-and-times";
+import "/var/db/scripts/import/junos.xsl";
+
+var $connection = jcs:open();
+
+template check-int-status($interface){
+  var $rpc = {
+    <rpc> {
+       <get-interface-information> {
+        <interface-name> $interface;
+      }
+    }
+  }
+  var $results = jcs:execute($connection, $rpc);
+  copy-of $results//physical-interface[name=$interface]/oper-status;
+}
+
+/* function to determine the local node name */
+template get-local-node() {
+  var $rpc = {
+    <rpc> {
+      <command> "show chassis routing-engine node local";
+    }
+  }
+  var $results = jcs:execute($connection,$rpc);
+  <result> $results/multi-routing-engine-item/re-name;
+}
+
+match / {
+  <op-script-results> {
+    var $node-name = {
+      call get-local-node();
+    }
+
+    if ($node-name  == "node0") {
+        var $op-status = {
+          call check-int-status($interface = "fab0");
+        }
+        <output> $op-status;
+        if ($op-status == "up") {
+            <output> "UP UP UP";
+        } else if ($op-status == "down") {
+            <output> "DOWN DOWN DOWN";
+        }
+    } else if ($node-name  == "node1") {
+        var $op-status = {
+          call check-int-status($interface = "fab1");
+        }
+        <output> $op-status;
+        if ($op-status == "up") {
+            <output> "UP UP UP";
+        } else if ($op-status == "down") {
+            <output> "DOWN DOWN DOWN";
+        }
+    }
+  }
+}
