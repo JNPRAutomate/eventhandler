@@ -13,7 +13,6 @@ import "/var/db/scripts/import/junos.xsl";
   ISSUES!!!
 
   Node 0 Southbound link shut
-  1) Node 0 priority does flip for RG-0 - ACK as it would because the logic path
   2) Node 0 reth0.0 OSPF is disabled - ACK as it would because of the logic path, only occurs if RG0 state is primary
   3) Node 1 does not flip the RG-0 priority - CHANGED: to ALWAYS flip priorities if condition occurs
 
@@ -174,8 +173,6 @@ template parse-log-message($message) {
 
                 
                 if ((normalize-space($ipmon-failure-reason) == "none") and (normalize-space($ipmon-failure-reason) != "ip-monitoring")) {
-                  /* Don't disable OSFP or change node priorities */
-                  /* Disable OSFP */
                   /* no IP mon failure detected */
                   var $node-priorities = {
                     call get-rg-conf-priorities() {
@@ -184,7 +181,8 @@ template parse-log-message($message) {
                   }
                   var $node-priorities-nodes = ext:node-set($node-priorities);
                   call open-config();
-                                    /* change node priorities */
+                  
+                  /* change node priorities */
                   <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
                   call set-rg-priorities() {
                     with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
@@ -205,19 +203,32 @@ template parse-log-message($message) {
                   var $node-priorities-nodes = ext:node-set($node-priorities);
                   call open-config();
 
-                  /* change node priorities */
-                  <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
-                  call set-rg-priorities() {
-                    with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
-                    with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
-                    with $rg-id = "0";
-                  }
-
                   if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
                     /* Only disable OSPF if node is primary */
                     <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
                     call disable-ospf-interface-ri(){
                       with $interface = $nodes//node[name=$node-name]/ospf-int;
+                    }
+                    /* Check to see if node priorities should be swapped */
+                    if ($node-name == "node1") {
+                      /* do not swap priorities for node1 failures */
+
+                    } else if ($node-name == "node0") {
+                       <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
+                      call set-rg-priorities() {
+                        with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
+                        with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
+                        with $rg-id = "0";
+                      }
+                    }
+
+                  } else {
+                    /* change node priorities */
+                    <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
+                    call set-rg-priorities() {
+                      with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
+                      with $node1 = $node-priorities-nodes//node[name="node0"]/priority;
+                      with $rg-id = "0";
                     }
                   }
 
