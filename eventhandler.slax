@@ -65,6 +65,7 @@ var $node-map = {
 /* parse log message */
 template parse-log-message($message) {
   /* match only JSRPD messages, return XML of message */
+  <output> "Processing message: " _ $message;
 
   /* types to match */
   var $rg-state-change = "JSRPD_RG_STATE_CHANGE";
@@ -111,6 +112,7 @@ template parse-log-message($message) {
           var $logs = ext:node-set($failures-nodes//logs//*);
 
           for-each($logs) {
+            <output> "Processing chassis cluster logs";
             /* loop through chassis cluster log messages */
             var $line = normalize-space(.);
             var $new-line = jcs:regex("(.*) : (.*)->(.*), reason: (.*)",$line);
@@ -191,6 +193,7 @@ template parse-log-message($message) {
                   call open-config();
 
                   if ("primary" == $rg-status-nodes//node[name=$node-name]/status) {
+                    <output> "Node " _ $node-name _ " is primary for rg0";
                     /* Only disable OSPF if node is primary */
                     <output> "Disabling OSPF on interface: " _ $nodes//node[name=$node-name]/ospf-int _ " Failure Reason: " _ $ipmon-failure-reason;
                     call disable-ospf-interface-ri(){
@@ -211,6 +214,7 @@ template parse-log-message($message) {
                     }
 
                   } else {
+                    <output> "Node " _ $node-name _ " is not primary for rg0";
                     /* change node priorities */
                     <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
                     call set-rg-priorities() {
@@ -277,6 +281,7 @@ template parse-log-message($message) {
         var $chassis-cluster-info-nodes = ext:node-set($chassis-cluster-info);
   			var $logs = ext:node-set($chassis-cluster-info-nodes//logs//*);
         for-each($logs) {
+          <output> "Processing chassis cluster logs";
           var $line = normalize-space(.);
   				var $new-line = jcs:regex("(.*) : (.*)->(.*), reason: (.*)",$line);
   				var $time = normalize-space($new-line[2]);
@@ -639,10 +644,10 @@ match / {
   <output> "EVENTD MESSAGE RECEIVED: " _ $event;
   var $node-map-nodes = ext:node-set($node-map);
   if (($node-map-nodes//node[name="node0"]/ospf-int == "") or ($node-map-nodes//node[name="node1"]/ospf-int  == "") or ($monitored-rg == "") or ($ospf-area == "") or ($ospf-ri == "") or ($event-diff == "") or ($event-sleep == "") or ($restore-diff == "")) {
-    <output> "Configuration not correctly defined under chassis cluster";
+    <output> "Macro configuration not correctly defined under chassis cluster";
     expr jcs:close($connection);
   } else {
-    <output> "Configuration correctly defined";
+    <output> "Macro configuration correctly defined";
     call parse-log-message(){
       with $message = $event;
     }
