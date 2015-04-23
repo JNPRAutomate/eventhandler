@@ -246,7 +246,6 @@ template parse-log-message($message) {
       /* rg group not set */
       <output> "RG not determined, skipping.";
     }
-
   } else if ($type == $ip-mon-up) {
     /* IP Monitor failure recovered JSRPD_UNSET_IP_MON_FAILURE */
     var $rg-group-regex = jcs:regex("IP Monitor failure recovered for redundancy-group ([0-9]+)",$data);
