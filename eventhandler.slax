@@ -8,20 +8,6 @@ import "/var/db/scripts/import/junos.xsl";
 
 /* globals */
 
-/*
-
-  ISSUES!!!
-
-  Node 0 Southbound link shut
-  2) Node 0 reth0.0 OSPF is disabled - ACK as it would because of the logic path, only occurs if RG0 state is primary
-  3) Node 1 does not flip the RG-0 priority - CHANGED: to ALWAYS flip priorities if condition occurs
-
-  Node 0 Southbound link restoration
-  1) Since both node0 and 1 report a priority of 1 for RG-0 the control plane shuts down on node 1 and changes to node 0 -  CHANGED: to ALWAYS flip priorities if condition occurs
-  2) OSPF does not re-enable on node 0 reth0.0 - THIS IS NOT BEING TRIGGERED TODO: Determine why this isnt being triggered
-
-*/
-
 /* event message recieved from the event engine */
 var $event = event-script-input/trigger-event/message;
 
@@ -59,8 +45,6 @@ var $event-diff = $config-results//apply-macro[name="eventhandler"]/data[name="e
 var $event-sleep = $config-results//apply-macro[name="eventhandler"]/data[name="event-sleep"]/value;
 /* max diff in sec between events for ip restore suggested 60 */
 var $restore-diff = $config-results//apply-macro[name="eventhandler"]/data[name="restore-diff"]/value;
-/* redundancy group for control plane or RG 0 to follow in the event of a failover */
-var $follow-the-leader-rg = $config-results//apply-macro[name="eventhandler"]/data[name="follow-the-leader"]/value;
 
 /* XML structure used to map information to each node in the cluster */
 var $node-map = {
@@ -174,6 +158,7 @@ template parse-log-message($message) {
                 
                 if ((normalize-space($ipmon-failure-reason) == "none") and (normalize-space($ipmon-failure-reason) != "ip-monitoring")) {
                   /* no IP mon failure detected */
+                  <output> "IP Monitor failure not detected";
                   var $node-priorities = {
                     call get-rg-conf-priorities() {
                       with $rg-id = "0";
@@ -195,7 +180,9 @@ template parse-log-message($message) {
                   }
 
                 } else if ((normalize-space($ipmon-failure-reason) == "ip-monitoring") and (normalize-space($ipmon-failure-reason) != "none")) {
-                  var $node-priorities = {
+                  <output> "IP Monitor failure detected";
+
+                  var $node-priorities = {  
                     call get-rg-conf-priorities() {
                       with $rg-id = "0";
                     }
@@ -212,8 +199,9 @@ template parse-log-message($message) {
                     /* Check to see if node priorities should be swapped */
                     if ($node-name == "node1") {
                       /* do not swap priorities for node1 failures */
-
+                      <output> "Not swapping prioriries due to being node1";
                     } else if ($node-name == "node0") {
+                       <output> "Not swapping prioriries on node0";
                        <output> "Setting node priorities: Setting node0 to " _ $node-priorities-nodes//node[name="node1"]/priority _ " and setting node1 to " _ $node-priorities-nodes//node[name="node0"]/priority _ " for rg0";
                       call set-rg-priorities() {
                         with $node0 = $node-priorities-nodes//node[name="node1"]/priority;
@@ -249,50 +237,6 @@ template parse-log-message($message) {
         } else {
           /* node state not matched to required state */
           <output> "Node state " _ $rg-status-nodes//node[name=$node-name]/status _ " does not match, skipping.";
-        }
-      } else if ($follow-the-leader-rg == $rg-group) {
-        /* follow the leader checking */
-        <output> "Checking the follow the leader status of redundancy group: " _ $follow-the-leader-rg;
-
-        var $node-name = {
-          call get-local-node();
-        }
-        var $nodes = ext:node-set($node-map);
-
-        /* $node-name; local node determined earlier */
-        var $rg0-status = {
-          call get-rg-status() {
-            with $rg-id = "0";
-          }
-        }
-        var $rg0-status-nodes = ext:node-set($rg0-status);
-
-        /* get status of the FTL rg */
-        var $rgftl-status = {
-          call get-rg-status() {
-            with $rg-id = $follow-the-leader-rg;
-          }
-        }
-        var $rgftl-status-nodes = ext:node-set($rgftl-status);
-
-        /* Validate that the state is now primary for rg 0 */
-        if (("primary" != $rg0-status-nodes//node[name=$node-name]/status) and ("primary" == $rgftl-status-nodes//node[name=$node-name]/status)) {
-          /* node is not primary for RG0 but is primary for FTLRG */
-          <output> "Node is not primary for RG0 but is primary for redundancy group " _ $follow-the-leader-rg _ " requesting failover";
-          
-          call request-rg-failover() {
-            with $node = $nodes//node[name=$node-name]/node-id;
-            with $redundancy-group = "0";
-          }
-
-          <output> "Resetting maual failover for redundancy group " _ $follow-the-leader-rg;
-          /* reset manual failover */
-          call reset-failover-flag() {
-            with $redundancy-group = "0";
-          }
-
-        } else {
-          /* node does not match conditions to initate follow the leader */
         }
       } else {
         /* rg not monitored */
